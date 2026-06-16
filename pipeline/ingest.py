@@ -18,6 +18,14 @@ class FredEndpoint(Enum):
 
 class CommodityBasket(Enum):
     BRENT = "POILBREUSDM"
+    WTI = "DCOILWTICO"
+    NATURAL_GAS = "DHHNGSP"
+    COPPER = "PCOPPUSDM"
+    ALUMINIUM = "PALUMUSDM"
+    WHEAT = "PWHEAMTUSDM"
+    CORN = "PMAIZMTUSDM"
+    DXY = "DTWEXBGS"
+    TREASURY_10Y = "DGS10"
 
 @dataclass
 class Series:
@@ -111,7 +119,7 @@ class SeriesObservations(Series):
         )
 
 
-def get_data(id: str) -> tuple[dict[str,Any],dict[str,Any]]:  # pyright: ignore[reportExplicitAny]
+def get_data(id: str, session: requests.Session) -> tuple[dict[str,Any],dict[str,Any]]:  # pyright: ignore[reportExplicitAny]
     url_series = FredEndpoint.SERIES.value 
     url_obs = FredEndpoint.OBSERVATIONS.value
     PARAMS = {
@@ -119,22 +127,21 @@ def get_data(id: str) -> tuple[dict[str,Any],dict[str,Any]]:  # pyright: ignore[
         'series_id': id,
         'file_type': 'json'
     }
-    with requests.Session() as session:
-        logger.info(f"Fetching data for series {id}")
-        try:
-            response_series = session.get(
-                url_series,
-                params=PARAMS
-            )
-            response_obs = session.get(
-                url_obs,
-                params=PARAMS
-            )
-            response_series.raise_for_status()
-            response_obs.raise_for_status()
-        except requests.RequestException as e:
-            logger.error(f"Request failed for series {id=}: {e}")
-            raise
+    logger.info(f"Fetching data for series {id}")
+    try:
+        response_series = session.get(
+            url_series,
+            params=PARAMS
+        )
+        response_obs = session.get(
+            url_obs,
+            params=PARAMS
+        )
+        response_series.raise_for_status()
+        response_obs.raise_for_status()
+    except requests.RequestException as e:
+        logger.error(f"Request failed for series {id=}: {e}")
+        raise
 
     return response_series.json(), response_obs.json()
 
