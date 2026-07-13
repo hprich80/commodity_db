@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 def get_connection() -> PgConnection:
     return psycopg2.connect(
-        host = 'localhost',
+        host = 'postgres-fred',
         dbname = 'fred_pipeline',
         user = 'postgres',
         password = 'password',
