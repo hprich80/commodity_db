@@ -5,6 +5,19 @@
 </head>
 <body>
     <h1>Commodity Dashboard</h1>
-    <p>Pipeline is running.</p>
+    <table>
+        <tr>
+            <th>Series</th>
+            <th>Date</th>
+            <th>Value</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
