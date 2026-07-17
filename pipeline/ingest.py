@@ -29,7 +29,7 @@ class CommodityBasket(Enum):
 
 @dataclass
 class Series:
-    id: str
+    series_id: str
 
 @dataclass
 class SeriesMetaData(Series):
@@ -49,20 +49,20 @@ class SeriesMetaData(Series):
     notes: str
 
     @classmethod
-    def from_FRED_response(cls, id: str, json: dict[str, Any]) -> 'SeriesMetaData':  # pyright: ignore[reportExplicitAny]
+    def from_FRED_response(cls, series_id: str, json: dict[str, Any]) -> 'SeriesMetaData':  # pyright: ignore[reportExplicitAny]
 
-        logger.info(f"Constructing series metadata for {id}")
+        logger.info(f"Constructing series metadata for {series_id}")
 
         if not (seriess_list := json.get('seriess')):
-            logger.error(f"FRED response for {id} contains no series metadata. Response: {json}")
-            raise KeyError(f"FRED response for {id} contains no series metadata.")
+            logger.error(f"FRED response for {series_id} contains no series metadata. Response: {json}")
+            raise KeyError(f"FRED response for {series_id} contains no series metadata.")
 
         seriess: dict[str, str] = seriess_list[0]  # pyright: ignore[reportAny]
 
         try:
-            logger.info(f"Successfully parsed metadata for {id}")
+            logger.info(f"Successfully parsed metadata for {series_id}")
             return cls(
-                id = id,
+                series_id = series_id,
                 realtime_start = seriess['realtime_start'],
                 realtime_end = seriess['realtime_end'],
                 title = seriess['title'],
@@ -79,7 +79,7 @@ class SeriesMetaData(Series):
                 notes = seriess['notes']
             )
         except KeyError as e:
-            logger.error(f"Missing expected metadata for key {e} in FRED response for {id}")
+            logger.error(f"Missing expected metadata for key {e} in FRED response for {series_id}")
             raise
 
 
@@ -89,13 +89,13 @@ class SeriesObservations(Series):
     value: list[float | None]
 
     @classmethod
-    def from_FRED_response(cls, id: str, json: dict[str, Any]) -> 'SeriesObservations':  # pyright: ignore[reportExplicitAny]
+    def from_FRED_response(cls, series_id: str, json: dict[str, Any]) -> 'SeriesObservations':  # pyright: ignore[reportExplicitAny]
 
-        logger.info(f"Constructing series observations for {id}")
+        logger.info(f"Constructing series observations for {series_id}")
 
         if not (observations := json.get('observations')):
-            logger.error(f"FRED response for {id} contains no series observations. Response: {json}")
-            raise KeyError(f"FRED response for {id} contains no series observations.")
+            logger.error(f"FRED response for {series_id} contains no series observations. Response: {json}")
+            raise KeyError(f"FRED response for {series_id} contains no series observations.")
 
         datelist: list[datetime.date] = [] 
         valuelist: list[float | None] = []
@@ -103,31 +103,56 @@ class SeriesObservations(Series):
         try:
             for obs in observations:  # pyright: ignore[reportAny]
                 datelist.append(datetime.date.fromisoformat(obs['date']))  # pyright: ignore[reportAny]
-                valuelist.append(None if obs['value'] == '.' else float(str(obs['value'])))  # pyright: ignore[reportAny]
+                valuelist.append(None if obs['value'] == '.' else float(obs['value']))  # pyright: ignore[reportAny]
         except KeyError as e:
-            logger.error(f"Failed to parse observations for {id}. Contains malformed key: {e}")
+            logger.error(f"Failed to parse observations for {series_id}. Contains malformed key: {e}")
             raise
         except ValueError as e:
-            logger.error(f"Failed to parse observations for {id}. Contains malformed value: {e}")
+            logger.error(f"Failed to parse observations for {series_id}. Contains malformed value: {e}")
             raise
 
-        logger.info(f"Successfully parsed {len(datelist)} observations for {id}. Rows with missing values: {valuelist.count(None)}")
+        logger.info(f"Successfully parsed {len(datelist)} observations for {series_id}. Rows with missing values: {valuelist.count(None)}")
         return cls(
-            id = id,
+            series_id = series_id,
             date = datelist,
             value = valuelist
         )
 
+@dataclass
+class TradeData:
+    series_id: str
+    trade_date: str
+    direction: str
+    price: float
+    quantity: int
 
-def get_data(id: str, session: requests.Session) -> tuple[dict[str,Any],dict[str,Any]]:  # pyright: ignore[reportExplicitAny]
+    @classmethod
+    def from_form(cls, series_id: str, form: dict[str, str]) -> 'TradeData':
+        logger.info(f"Parsing form for {series_id}")
+
+        try:
+            return cls(
+                series_id = series_id,
+                trade_date = form['trade_date'],
+                direction = form['direction'],
+                price = float(form['price']),
+                quantity = int(form['quantity'])
+            )
+
+        except (ValueError, TypeError) as e:
+            logger.error(f"Failed to parse form for {series_id}: {e}")
+            raise
+
+
+def get_data(series_id: str, session: requests.Session) -> tuple[dict[str,Any],dict[str,Any]]:  # pyright: ignore[reportExplicitAny]
     url_series = FredEndpoint.SERIES.value 
     url_obs = FredEndpoint.OBSERVATIONS.value
     PARAMS = {
         'api_key': API_KEY,
-        'series_id': id,
+        'series_id': series_id,
         'file_type': 'json'
     }
-    logger.info(f"Fetching data for series {id}")
+    logger.info(f"Fetching data for series {series_id}")
     try:
         response_series = session.get(
             url_series,
@@ -140,7 +165,7 @@ def get_data(id: str, session: requests.Session) -> tuple[dict[str,Any],dict[str
         response_series.raise_for_status()
         response_obs.raise_for_status()
     except requests.RequestException as e:
-        logger.error(f"Request failed for series {id=}: {e}")
+        logger.error(f"Request failed for series {series_id=}: {e}")
         raise
 
     return response_series.json(), response_obs.json()
