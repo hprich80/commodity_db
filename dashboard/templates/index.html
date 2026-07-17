@@ -11,12 +11,14 @@
             <th>Date</th>
             <th>Value</th>
         </tr>
-        {% for row in historical_prices %}
-        <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-        </tr>
+        {% for series_id, observations in historical_prices.items() %}
+          {% for date, value in observations.items() %}
+          <tr>
+              <td>{{ series_id }}</td>
+              <td>{{ date }}</td>
+              <td>{{ value }}</td>
+          </tr>
+          {% endfor %}
         {% endfor %}
     </table>
 </body>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Trade</title>
+</head>
+<body>
+    <h1>Enter Trade</h1>
+    <form method="POST" action="/trades/new">
+        <label>Series</label>
+        <select name="series_id">
+            <option value="POILBREUSDM">Brent Crude</option>
+            <option value="DCOILWTICO">WTI</option>
+            <option value="DHHNGSP">Natural Gas</option>
+            <option value="PCOPPUSDM">Copper</option>
+            <option value="PALUMUSDM">Aluminium</option>
+            <option value="GOLDPMGBD228NLBM">Gold</option>
+            <option value="PWHEAMTUSDM">Wheat</option>
+            <option value="PMAIZMTUSDM">Corn</option>
+            <option value="DTWEXBGS">DXY</option>
+            <option value="DGS10">10Y Treasury</option>
+        </select>
+
+        <br><br>
+
+        <label>Direction</label>
+        <select name="direction">
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+        </select>
+
+        <br><br>
+
+        <label>Trade Date</label>
+        <input type="date" name="trade_date" required>
+
+        <br><br>
+
+        <label>Price</label>
+        <input type="number" name="price" step="0.01" min="0" required>
+
+        <br><br>
+
+        <label>Quantity</label>
+        <input type="number" name="quantity" min="1" required>
+
+        <br><br>
+
+        <button type="submit">Submit Trade</button>
+    </form>
+    <br>
+    <a href="/">Back to Dashboard</a>
+</body>
+</html>

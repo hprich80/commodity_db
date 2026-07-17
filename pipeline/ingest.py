@@ -121,10 +121,11 @@ class SeriesObservations(Series):
 @dataclass
 class TradeData:
     series_id: str
-    trade_date: str
+    trade_date: datetime.date
     direction: str
     price: float
     quantity: int
+    created_at: datetime.date | None
 
     @classmethod
     def from_form(cls, series_id: str, form: dict[str, str]) -> 'TradeData':
@@ -133,16 +134,15 @@ class TradeData:
         try:
             return cls(
                 series_id = series_id,
-                trade_date = form['trade_date'],
+                trade_date = datetime.date.fromisoformat(form['trade_date']),
                 direction = form['direction'],
                 price = float(form['price']),
-                quantity = int(form['quantity'])
-            )
-
+                quantity = int(form['quantity']),
+                created_at = None 
+            ) 
         except (ValueError, TypeError) as e:
             logger.error(f"Failed to parse form for {series_id}: {e}")
             raise
-
 
 def get_data(series_id: str, session: requests.Session) -> tuple[dict[str,Any],dict[str,Any]]:  # pyright: ignore[reportExplicitAny]
     url_series = FredEndpoint.SERIES.value 
