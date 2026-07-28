@@ -98,13 +98,3 @@ def insert_observations(conn: PgConnection, observations: SeriesObservations):
 
         conn.commit()
 
-def insert_trade(conn: PgConnection, trade: TradeData):
-    with conn.cursor() as cur:
-        row = (trade.series_id, trade.direction, trade.trade_date, trade.price, trade.quantity)
-        cur.execute("""
-                    INSERT INTO trade_data (series_id, direction, trade_date, price, quantity, created_at)
-                    VALUES (%s, %s, %s, %s, %s, NOW());
-                    """, row
-                    )
-    conn.commit()
-
