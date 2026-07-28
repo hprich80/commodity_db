@@ -1,4 +1,4 @@
-from .ingest import SeriesMetaData, SeriesObservations
+from .models import SeriesMetaData, SeriesObservations
 import logging
 import datetime
 

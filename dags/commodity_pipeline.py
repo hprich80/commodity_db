@@ -5,7 +5,8 @@ import requests
 from airflow import DAG  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
 from airflow.operators.python import PythonOperator  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
 from datetime import datetime
-from pipeline.ingest import CommodityBasket, SeriesMetaData, SeriesObservations, get_data
+from pipeline.models import CommodityBasket, SeriesMetaData, SeriesObservations 
+from pipeline.ingest import get_data
 from pipeline.load import create_tables, get_connection, insert_metadata, insert_observations
 from pipeline.validate import validate_series 
 

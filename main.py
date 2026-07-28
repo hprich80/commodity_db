@@ -1,4 +1,5 @@
-from pipeline.ingest import get_data, SeriesMetaData, SeriesObservations, CommodityBasket 
+from pipeline.ingest import get_data
+from pipeline.models import SeriesMetaData, SeriesObservations, CommodityBasket 
 from pipeline.load import get_connection, create_tables, insert_metadata, insert_observations 
 from pipeline.validate import validate_series
 import logging
