@@ -13,17 +13,19 @@
             <th>Trade Date</th>
             <th>Price</th>
             <th>Latest Price</th>
+            <th>Latest Price Date</th>
             <th>Log Date</th>
         </tr>
         {% for trade in trades %}
         <tr>
             <td>{{ trade.series_id }}</td>
-            <td>{{ trade.direction }}</td>
+            <td>{{ trade.direction | upper() }}</td>
             <td>{{ trade.quantity }}</td>
-            <td>{{ trade.trade_date }}</td>
-            <td>{{ trade.price }}</td>
-            <td>{{ latest_prices.get(trade.series_id, (None, None)[1]) or 'N/A' }}</td>
-            <td>{{ trade.created_at }}</td>
+            <td>{{ trade.trade_date.strftime("%Y/%m/%d") }}</td>
+            <td>{{ "%.2f" | format(trade.price) }}</td>
+            <td>{{ "%.2f" | format((latest_prices.get(trade.series_id) or (None, None))[1]) }}</td>
+            <td>{{ (latest_prices.get(trade.series_id) or (None, None))[0].strftime("%Y/%m/%d") }}</td>
+            <td>{{ trade.created_at.strftime("%Y/%m/%d") }}</td>
         </tr>
         {% endfor %}
     </table>

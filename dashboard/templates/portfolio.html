@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FRED Commodity Pipeline</title>
+</head>
+<body>
+    <h1>Portfolio </h1>
+    <table>
+        <tr>
+            <th>Series</th>
+            <th>Quantity</th>
+            <th>Current Price</th>
+            <th>Avg. Cost</th>
+            <th>Unrealised PnL</th>
+            <th>Realised PnL</th>
+        </tr>
+        {% for position in net_positions %}
+        <tr>
+            <td>{{ position.series_id }}</td>
+            <td>{{ position.net_quantity }}</td>
+            <td>{{ "%.2f" | format(position.current_price) }}</td>
+            <td>{{ "%.2f" | format(position.avg_cost) }}</td>
+            <td>{{ "%.2f" | format(position.unrealised_pnl) }}</td>
+            <td>{{ "%.2f" | format(position.realised_pnl) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
