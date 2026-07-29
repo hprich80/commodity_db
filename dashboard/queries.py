@@ -1,5 +1,4 @@
 import datetime
-from psycopg2.extensions import cursor
 from dashboard.db import get_db_cursor
 from pipeline.models import TradeData
 

@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extensions import connection as PgConnection
-from .models import SeriesMetaData, SeriesObservations, TradeData
+from .models import SeriesMetaData, SeriesObservations 
 import logging
 
 logger = logging.getLogger(__name__)

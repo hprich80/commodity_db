@@ -1,6 +1,5 @@
 from flask import Flask, redirect, render_template, request, url_for
 from pipeline.models import TradeData
-from .db import get_connection
 from .queries import get_historical_prices, get_latest_price, get_trades, insert_trade
 from .services import calculate_open_positions 
 
