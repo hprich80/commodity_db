@@ -1,6 +1,6 @@
 from collections import defaultdict
 import datetime
-from dashboard.db import get_db_cursor
+from db import get_db_cursor
 from pipeline.models import TradeData
 
 def get_latest_price():

@@ -5,7 +5,6 @@ from .services import calculate_open_positions
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def index():
     historical_prices = get_historical_prices()

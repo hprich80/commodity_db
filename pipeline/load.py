@@ -1,18 +1,8 @@
-import psycopg2
-from psycopg2.extensions import connection as PgConnection
 from .models import SeriesMetaData, SeriesObservations 
 import logging
+from psycopg2.extensions import connection as PgConnection
 
 logger = logging.getLogger(__name__)
-
-def get_connection() -> PgConnection:
-    return psycopg2.connect(
-        host = 'postgres-fred',
-        dbname = 'fred_pipeline',
-        user = 'postgres',
-        password = 'password',
-        port = 5432
-    )
 
 def create_tables(conn: PgConnection):
     with conn.cursor() as cur:

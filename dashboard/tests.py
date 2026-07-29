@@ -1,6 +1,6 @@
 import datetime
 from pipeline.models import TradeData
-from dashboard.app import calculate_open_positions
+from dashboard.services import calculate_open_positions
 
 def generate_test_data():
     trades = [
