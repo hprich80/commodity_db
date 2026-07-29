@@ -1,3 +1,4 @@
+from collections import defaultdict
 import datetime
 from dashboard.db import get_db_cursor
 from pipeline.models import TradeData
@@ -13,7 +14,7 @@ def get_latest_price():
             ORDER BY series_id, date DESC
             """
         )
-        rows = cur.fetchall()
+        rows: list[tuple[str, datetime.date, float]] = cur.fetchall()
         latest_prices: dict[str, tuple[datetime.date, float]] = {
             series_id: (date, value) 
             for series_id, date, value in rows
@@ -21,7 +22,7 @@ def get_latest_price():
     return latest_prices
 
 
-def get_historical_prices() -> dict[str, dict[str, str]]:
+def get_historical_prices(): 
     with get_db_cursor() as cur:
         cur.execute(
             """
@@ -30,8 +31,8 @@ def get_historical_prices() -> dict[str, dict[str, str]]:
             ORDER BY series_id, date DESC 
             """
         )
-        rows: list[tuple[str, str, str]] = cur.fetchall()
-        prices = {}
+        rows: list[tuple[str, datetime.date, float]] = cur.fetchall()
+        prices: dict[str, dict[datetime.date, float]] = defaultdict(dict)
         for series_id, date, value in rows:
             if series_id not in prices:
                 prices[series_id] = {}
@@ -47,7 +48,7 @@ def get_trades() -> list[TradeData]:
             FROM trade_data
             """
         )
-        result = cur.fetchall()
+        result: list[tuple[str, datetime.date, str, float, int, datetime.date]] = cur.fetchall()
         trades = [
             TradeData(
                 series_id,
