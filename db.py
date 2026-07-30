@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from psycopg2.extensions import connection as PgConnection
 
 def get_connection() -> PgConnection:
-    db_url = os.getenv("DB_URL", 'postgresql://postgres:password@localhost:5432/fred_pipeline')
+    db_url = os.getenv("DB_URL")
     return psycopg2.connect(db_url)
 
 @contextmanager
