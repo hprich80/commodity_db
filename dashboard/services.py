@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import date
+from dashboard.queries import get_historical_prices
 from pipeline.models import TradeData
 from .models import Position
 
@@ -36,4 +37,12 @@ def calculate_open_positions(latest_prices: dict[str, tuple[date, float]], trade
         net_positions.append(position)
 
     return net_positions
+
+def get_historical_prices_json_format():
+    prices = get_historical_prices()
+    json_prices: dict[str, dict[str, float]] = {
+        series_id: {date.isoformat(date_key): value for date_key, value in observations.items()} 
+        for series_id, observations in prices.items()
+    }
+    return json_prices
 
