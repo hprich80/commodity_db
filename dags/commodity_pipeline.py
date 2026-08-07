@@ -2,7 +2,7 @@ import sys
 sys.path.insert(0, '/opt/airflow/project')
 
 import requests
-from airflow import DAG  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+from airflow import DAG 
 from airflow.operators.python import PythonOperator  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
 from datetime import datetime
 from pipeline.models import CommodityBasket, SeriesMetaData, SeriesObservations 
@@ -35,7 +35,7 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    pipeline_task = PythonOperator(
+    pipeline_task = PythonOperator(  # pyright: ignore[reportUnknownVariableType]
         task_id = "run_pipeline",
         python_callable = run_pipeline,
     )

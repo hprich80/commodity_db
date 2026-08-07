@@ -1,0 +1,102 @@
+:root {
+    --bg: #282828;
+    --panel: #1d2021;
+    --border: #3c3836;
+    --text: #ebdbb2;
+    --text-dim: #928374;
+    --accent: #fabd2f;
+    --green: #b8bb26;
+    --red: #fb4934;
+}
+* { box-sizing: border-box; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 24px 32px 48px;
+}
+nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    margin-right: 20px;
+    font-size: 14px;
+}
+nav a:hover { color: var(--accent); }
+h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 20px 0 16px;
+}
+h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin: 0 0 12px;
+}
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+}
+.chart-panel {
+    margin-bottom: 20px;
+}
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+select {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+.chart-wrap { height: 220px; }
+
+.grid-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+@media (max-width: 900px) {
+    .grid-bottom { grid-template-columns: 1fr; }
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+    text-align: right;
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+}
+th:first-child, td:first-child { text-align: left; }
+td {
+    text-align: right;
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+}
+tr:last-child td { border-bottom: none; }
+.series-name { font-weight: 600; }
+.freq-tag {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+.pos { color: var(--green); }
+.neg { color: var(--red); }
+.na { color: var(--text-dim); }

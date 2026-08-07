@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date
 from dashboard.queries import get_historical_prices, get_metadata
 from pipeline.models import TradeData
 from .models import Position

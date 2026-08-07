@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FRED Commodity Pipeline</title>
-</head>
-<body>
-    <a href="/">Home</a>
-    <a href="/trades/new">New Trade</a>
-    <a href="/portfolio">portfolio</a>
+{% extends "base.html" %}
+{% block title %}Dashboard — FRED Commodity Pipeline{% endblock %}
+{% block content %}
     <h1>Trades </h1>
     <table>
         <tr>
@@ -32,5 +26,6 @@
         </tr>
         {% endfor %}
     </table>
+{% endblock %}
 </body>
 </html>

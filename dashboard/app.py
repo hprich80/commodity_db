@@ -2,7 +2,7 @@ import os
 from flask import Flask, redirect, render_template, request, url_for
 from pipeline.models import TradeData
 from .queries import get_latest_price, get_metadata, get_trades, insert_trade
-from .services import calculate_open_positions, get_historical_prices_json_format 
+from .services import calculate_open_positions, get_historical_prices_json_format, get_price_summary 
 from dotenv import load_dotenv
 
 _ = load_dotenv(".env.local", override=True)
@@ -14,9 +14,11 @@ app = Flask(__name__)
 def index():
     historical_prices = get_historical_prices_json_format()
     latest_prices = get_latest_price()
+    price_summary= get_price_summary()
     metadata = get_metadata()
-    
-    return render_template('index2.html', historical_prices=historical_prices, latest_prices=latest_prices)
+    trades = get_trades()
+    net_positions = calculate_open_positions(latest_prices, trades)
+    return render_template('index3.html', historical_prices=historical_prices, latest_prices=latest_prices, price_summary=price_summary, metadata=metadata, net_positions=net_positions)
 
 @app.route('/trades')
 def trades():
