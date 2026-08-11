@@ -18,7 +18,7 @@ def index():
     metadata = get_metadata()
     trades = get_trades()
     net_positions = calculate_open_positions(latest_prices, trades)
-    return render_template('index3.html', historical_prices=historical_prices, latest_prices=latest_prices, price_summary=price_summary, metadata=metadata, net_positions=net_positions)
+    return render_template('index.html', historical_prices=historical_prices, latest_prices=latest_prices, price_summary=price_summary, metadata=metadata, net_positions=net_positions)
 
 @app.route('/trades')
 def trades():
@@ -35,7 +35,8 @@ def new_trade():
         )
         insert_trade(trade)
         return redirect(url_for('trades'))
-    return render_template('new_trade.html')
+    metadata = get_metadata()
+    return render_template('new_trade.html', metadata=metadata)
 
 @app.route('/portfolio')
 def portfolio():

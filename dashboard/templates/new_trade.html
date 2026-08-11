@@ -1,51 +1,48 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — FRED Commodity Pipeline{% endblock %}
+
+{% block title %}New Trade — FRED Commodity Pipeline{% endblock %}
+
 {% block content %}
     <h1>Enter Trade</h1>
-    <form method="POST" action="/trades/new">
-        <label>Series</label>
-        <select name="series_id">
-            <option value="POILBREUSDM">Brent Crude</option>
-            <option value="DCOILWTICO">WTI</option>
-            <option value="DHHNGSP">Natural Gas</option>
-            <option value="PCOPPUSDM">Copper</option>
-            <option value="PALUMUSDM">Aluminium</option>
-            <option value="GOLDPMGBD228NLBM">Gold</option>
-            <option value="PWHEAMTUSDM">Wheat</option>
-            <option value="PMAIZMTUSDM">Corn</option>
-            <option value="DTWEXBGS">DXY</option>
-            <option value="DGS10">10Y Treasury</option>
-        </select>
 
-        <br><br>
+    <div class="panel form-panel">
+        <form method="POST" action="/trades/new" class="trade-form">
+            <div class="form-row">
+                <label for="series_id">Series</label>
+                <select id="series_id" name="series_id" required>
+                    {% for series_id, m in metadata.items() %}
+                    <option value="{{ series_id }}">{{ series_id }} - {{ m['title'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <label>Direction</label>
-        <select name="direction">
-            <option value="buy">Buy</option>
-            <option value="sell">Sell</option>
-        </select>
+            <div class="form-row">
+                <label for="direction">Direction</label>
+                <select id="direction" name="direction">
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                </select>
+            </div>
 
-        <br><br>
+            <div class="form-row">
+                <label for="trade_date">Trade Date</label>
+                <input type="date" id="trade_date" name="trade_date" required>
+            </div>
 
-        <label>Trade Date</label>
-        <input type="date" name="trade_date" required>
+            <div class="form-row">
+                <label for="price">Price</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" required>
+            </div>
 
-        <br><br>
+            <div class="form-row">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" min="1" required>
+            </div>
 
-        <label>Price</label>
-        <input type="number" name="price" step="0.01" min="0" required>
-
-        <br><br>
-
-        <label>Quantity</label>
-        <input type="number" name="quantity" min="1" required>
-
-        <br><br>
-
-        <button type="submit">Submit Trade</button>
-    </form>
-    <br>
-    <a href="/">Back to Dashboard</a>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Submit Trade</button>
+                <a href="/" class="btn-secondary">Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
 {% endblock %}
-</body>
-</html>
