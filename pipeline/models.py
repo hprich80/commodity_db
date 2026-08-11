@@ -19,8 +19,6 @@ class CommodityBasket(Enum):
     ALUMINIUM = "PALUMUSDM"
     WHEAT = "PWHEAMTUSDM"
     CORN = "PMAIZMTUSDM"
-    DXY = "DTWEXBGS"
-    TREASURY_10Y = "DGS10"
 
 @dataclass()
 class Series:
