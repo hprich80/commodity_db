@@ -1,6 +1,5 @@
 from .models import SeriesMetaData, SeriesObservations 
 import logging
-from psycopg2.extensions import connection as PgConnection
 from db import get_db_cursor
 logger = logging.getLogger(__name__)
 
