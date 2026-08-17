@@ -1,11 +1,12 @@
 from .models import SeriesMetaData, SeriesObservations 
 import logging
 from psycopg2.extensions import connection as PgConnection
-
+from db import get_db_cursor
 logger = logging.getLogger(__name__)
 
-def create_tables(conn: PgConnection):
-    with conn.cursor() as cur:
+
+def create_tables():
+    with get_db_cursor() as cur:
         cur.execute("""
                     CREATE TABLE IF NOT EXISTS series_metadata(
                         series_id VARCHAR PRIMARY KEY,
@@ -39,10 +40,9 @@ def create_tables(conn: PgConnection):
                         created_at TIMESTAMP DEFAULT NOW()
                     );
                 """)
-        conn.commit()
 
-def insert_metadata(conn: PgConnection, metadata: SeriesMetaData):
-    with conn.cursor() as cur:
+def insert_metadata(metadata: SeriesMetaData):
+    with get_db_cursor() as cur:
         cur.execute("""
                     INSERT INTO series_metadata (series_id, title, frequency, units, seasonal_adjustment, last_updated, popularity, notes, fetched_at)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
@@ -60,16 +60,13 @@ def insert_metadata(conn: PgConnection, metadata: SeriesMetaData):
                         (EXCLUDED.title, EXCLUDED.frequency, EXCLUDED.units, EXCLUDED.seasonal_adjustment, EXCLUDED.last_updated, EXCLUDED.popularity, EXCLUDED.notes)
                     """, (metadata.series_id, metadata.title, metadata.frequency, metadata.units, metadata.seasonal_adjustment, metadata.last_updated, metadata.popularity, metadata.notes)
                     )
-
         if cur.rowcount > 0:
             logger.info(f"Upserted metadata for {metadata.series_id}")
         else:
             logger.info(f"No metadata changed for {metadata.series_id}")
 
-        conn.commit()
-
-def insert_observations(conn: PgConnection, observations: SeriesObservations):
-    with conn.cursor() as cur:
+def insert_observations(observations: SeriesObservations):
+    with get_db_cursor() as cur:
         rows= zip(observations.date, observations.value)
         cur.executemany("""
                     INSERT INTO series_observations (series_id, date, value, fetched_at)
@@ -80,11 +77,8 @@ def insert_observations(conn: PgConnection, observations: SeriesObservations):
                     WHERE series_observations.value IS DISTINCT FROM EXCLUDED.value;
                     """, [(observations.series_id, date, value) for date, value in rows]
                     )
-
         if cur.rowcount > 0:
             logger.info(f"Upserted {cur.rowcount} rows for {observations.series_id}")
         else:
             logger.info(f"No rows upserted for {observations.series_id}")
-
-        conn.commit()
 
