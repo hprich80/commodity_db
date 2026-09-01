@@ -6,13 +6,10 @@ from airflow.operators.python import PythonOperator  # pyright: ignore[reportMis
 from datetime import datetime
 from pipeline.models import CommodityBasket, SeriesMetaData, SeriesObservations 
 from pipeline.ingest import get_data
-from pipeline.load import create_tables, insert_metadata, insert_observations
-from db import get_connection
+from pipeline.load import insert_metadata, insert_observations
 from pipeline.validate import validate_series 
 
 def run_pipeline():
-    conn = get_connection()
-    create_tables()
     with requests.Session() as session:
         for Commodity in CommodityBasket:
             series, obs = get_data(Commodity.value, session = session)
@@ -21,8 +18,6 @@ def run_pipeline():
             validate_series(observations, metadata)
             insert_metadata(metadata)
             insert_observations(observations)
-
-    conn.close()
 
 with DAG(
     dag_id = "commodity_pipeline",
