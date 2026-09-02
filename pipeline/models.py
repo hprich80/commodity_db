@@ -86,9 +86,11 @@ class SeriesObservations(Series):
 
         logger.info(f"Constructing series observations for {series_id}")
 
-        if not (observations := json.get('observations')):
+        if (observations := json.get('observations')) is None:
             logger.error(f"FRED response for {series_id} contains no series observations. Response: {json}")
             raise KeyError(f"FRED response for {series_id} contains no series observations.")
+        if not observations:
+            logger.info(f"No new observations for {series_id}")
 
         datelist: list[datetime.date] = [] 
         valuelist: list[float | None] = []

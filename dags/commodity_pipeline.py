@@ -1,36 +1,38 @@
 import sys
 sys.path.insert(0, '/opt/airflow/project')
+from airflow.sdk import dag, task
 import requests
-from airflow import DAG 
-from airflow.operators.python import PythonOperator  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
-from datetime import datetime
+from datetime import datetime, timedelta
 from pipeline.models import CommodityBasket, SeriesMetaData, SeriesObservations 
 from pipeline.ingest import get_data
-from pipeline.load import create_tables, insert_metadata, insert_observations
-from db import get_connection
+from pipeline.load import get_latest_observation_date, insert_metadata, insert_observations
 from pipeline.validate import validate_series 
 
-def run_pipeline():
-    conn = get_connection()
-    create_tables()
-    with requests.Session() as session:
-        for Commodity in CommodityBasket:
-            series, obs = get_data(Commodity.value, session = session)
-            metadata: SeriesMetaData = SeriesMetaData.from_FRED_response(Commodity.value, series)
-            observations: SeriesObservations = SeriesObservations.from_FRED_response(Commodity.value, obs)
-            validate_series(observations, metadata)
-            insert_metadata(metadata)
-            insert_observations(observations)
-
-    conn.close()
-
-with DAG(
+@dag(
     dag_id = "commodity_pipeline",
     schedule = "@daily",
     start_date = datetime(2024,1,1),
     catchup=False,
-) as dag:
-    pipeline_task = PythonOperator(  # pyright: ignore[reportUnknownVariableType]
-        task_id = "run_pipeline",
-        python_callable = run_pipeline,
+)
+def commodity_pipeline():
+    @task(
+        retries = 3,
+        retry_delay=timedelta(seconds=30),
+        execution_timeout=timedelta(minutes=10),
+        retry_exponential_backoff=True
     )
+    def process_series(commodity: str):
+        last_observation = get_latest_observation_date(commodity)
+        start_date = last_observation + timedelta(days=1) if last_observation else None
+
+        with requests.Session() as session:
+            series, obs = get_data(commodity, session = session, observation_start=start_date)
+            metadata: SeriesMetaData = SeriesMetaData.from_FRED_response(commodity, series)
+            observations: SeriesObservations = SeriesObservations.from_FRED_response(commodity, obs)
+            validate_series(observations, metadata, last_observation)
+            insert_metadata(metadata)
+            insert_observations(observations)
+
+    process_series.expand(commodity=[c.value for c in CommodityBasket])
+
+_ = commodity_pipeline()
