@@ -105,6 +105,7 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+
   postgres-fred:
     image: postgres:16
     container_name: fred_db
@@ -116,7 +117,30 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
     restart: always
+
+  db-bootstrap-trigger:
+    <<: *airflow-common
+    command: 
+      - bash
+      - -c
+      - "airflow dags unpause db_bootstrap && airflow dags trigger db_bootstrap && airflow dags unpause commodity_pipeline"
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+      airflow-dag-processor:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      postgres-fred:
+        condition: service_healthy
+        
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change

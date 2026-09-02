@@ -1,3 +1,5 @@
+from datetime import date
+
 from .models import SeriesMetaData, SeriesObservations 
 import logging
 from db import get_db_cursor
@@ -80,4 +82,15 @@ def insert_observations(observations: SeriesObservations):
             logger.info(f"Upserted {cur.rowcount} rows for {observations.series_id}")
         else:
             logger.info(f"No rows upserted for {observations.series_id}")
+
+def get_latest_observation_date(series_id: str) -> date | None:
+    with get_db_cursor() as cur:
+        cur.execute("""
+                SElECT MAX(date) FROM series_observations WHERE series_id = (%s) 
+                """,
+            (series_id,)
+        )
+        result: list[tuple[date]] = cur.fetchall()
+    latest_date = result[0][0]
+    return latest_date
 
