@@ -12,7 +12,6 @@ with DAG(
     start_date = datetime(2024,1,1),
     dag_id = 'db_bootstrap',
     schedule = None,
-    is_paused_upon_creation=False
 ) as dag:
     pipeline_task = PythonOperator(  # pyright: ignore[reportUnknownVariableType]
         task_id = "pipeline_bootstrap",

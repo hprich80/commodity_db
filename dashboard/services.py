@@ -22,7 +22,7 @@ def calculate_open_positions(latest_prices: dict[str, tuple[date, float]], trade
             closed_quantity = net_quantity if closing_position else trade.quantity
             if inverse_trade:
                 trade_realised_pnl = closed_quantity * (trade.price - avg_cost)
-                trade_realised_pnl *= -1 if net_quantity < 0 else 1
+                trade_realised_pnl *= -1 if (net_quantity < 0 and not closing_position) else 1
                 realised_pnl += trade_realised_pnl
                 if closing_position:
                     avg_cost = trade.price
