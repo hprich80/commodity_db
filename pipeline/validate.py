@@ -26,8 +26,8 @@ def check_performance(obs: SeriesObservations, max_perf_threshold: float = 1.5):
         logger.info(f"No rows with unusual performance for series {obs.series_id}")
 
 def check_staleness(obs: SeriesObservations, metadata: SeriesMetaData, last_observation_date: date | None):
-    freq: str = metadata.frequency_short
-    freq_to_max_age = {"D":1, "W":7, "M":45}
+    freq: str = metadata.frequency
+    freq_to_max_age = {"Daily":1, "Weekly":7, "Monthly":45}
     max_age = freq_to_max_age.get(freq)
     if max_age is None:
         logger.warning(f"No frequency metadata for series {metadata.series_id}")
