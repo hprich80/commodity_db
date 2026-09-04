@@ -17,7 +17,7 @@ from pipeline.validate import validate_series
 def commodity_pipeline():
     @task(
         retries = 3,
-        retry_delay=timedelta(seconds=30),
+        retry_delay=timedelta(seconds=5),
         execution_timeout=timedelta(minutes=10),
         retry_exponential_backoff=True
     )
