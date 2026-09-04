@@ -1,12 +1,7 @@
-import os
 from flask import Flask, redirect, render_template, request, url_for
 from pipeline.models import TradeData
 from .queries import get_latest_price, get_metadata, get_trades, insert_trade
 from .services import calculate_open_positions, get_historical_prices_json_format, get_price_summary 
-from dotenv import load_dotenv
-
-_ = load_dotenv(".env.local", override=True)
-print("DB_URL:", os.getenv("DB_URL"))
 
 app = Flask(__name__)
 

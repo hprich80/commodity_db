@@ -26,17 +26,10 @@ class Series:
 
 @dataclass
 class SeriesMetaData(Series):
-    realtime_start: str
-    realtime_end: str
     title: str
-    observation_start: str
-    observation_end: str
     frequency: str
-    frequency_short: str
     units: str
-    units_short: str
     seasonal_adjustment: str
-    seasonal_adjustment_short: str
     last_updated: str
     popularity: int
     notes: str
@@ -56,17 +49,10 @@ class SeriesMetaData(Series):
             logger.info(f"Successfully parsed metadata for {series_id}")
             return cls(
                 series_id = series_id,
-                realtime_start = seriess['realtime_start'],
-                realtime_end = seriess['realtime_end'],
                 title = seriess['title'],
-                observation_start = seriess['observation_start'],
-                observation_end = seriess['observation_end'],
                 frequency = seriess['frequency'],
-                frequency_short = seriess['frequency_short'],
                 units = seriess['units'],
-                units_short = seriess['units_short'],
                 seasonal_adjustment = seriess['seasonal_adjustment'],
-                seasonal_adjustment_short = seriess['seasonal_adjustment_short'],
                 last_updated = seriess['last_updated'],
                 popularity = int(seriess['popularity']),
                 notes = seriess['notes']
@@ -75,6 +61,14 @@ class SeriesMetaData(Series):
             logger.error(f"Missing expected metadata for key {e} in FRED response for {series_id}")
             raise
 
+    @classmethod
+    def from_db_query(cls, db_response: tuple[Any, ...]) -> 'SeriesMetaData':
+        try:
+            return cls(*db_response)
+        except TypeError as e:
+            series_id: str = db_response[0] if db_response else "<empty_row>"
+            logger.error(f"Malformed DB row for {series_id}: {e}")
+            raise
 
 @dataclass
 class SeriesObservations(Series):

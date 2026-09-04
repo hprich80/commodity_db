@@ -1,7 +1,7 @@
 from collections import defaultdict
 from datetime import date
 from db import get_db_cursor
-from pipeline.models import TradeData
+from pipeline.models import SeriesMetaData, TradeData
 
 def get_latest_price():
     with get_db_cursor() as cur:
@@ -71,25 +71,15 @@ def insert_trade(trade: TradeData):
                     """, row
                     )
 
-def get_metadata() -> dict[str, dict[str, str]]:
+def get_metadata() -> dict[str, SeriesMetaData]:
     with get_db_cursor() as cur:
         cur.execute(
             """
             SELECT series_id, title, frequency, units, seasonal_adjustment, last_updated, popularity, notes 
-            FROM series_metadata"""
+            FROM series_metadata
+        """
         )
-        result: list[tuple[str, str, str, str, str, str, str, str]] = cur.fetchall()
-        metadata = {
-            series_id: {
-                "title": title,
-                "frequency": frequency,
-                "units": units,
-                "seasonal_adjustment": seasonal_adjustment,
-                "last_updated": last_updated,
-                "popularity": popularity,
-                "notes": notes,
-            }
-            for (series_id, title, frequency, units, seasonal_adjustment, last_updated, popularity, notes) in result
-        }
+        result= cur.fetchall()
+        metadata = {row[0]: SeriesMetaData.from_db_query(row) for row in result}
         return metadata
 

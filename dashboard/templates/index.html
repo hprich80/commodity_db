@@ -55,9 +55,9 @@
                 {% for series_id, s in price_summary.items() %}
                 <tr>
                     <td class="series-name">
-                        {{ series_id }}
+                        {{ series_id + " - " + metadata[series_id].title }}
                         <span class="freq-tag">
-                            {{ "Monthly" if metadata[series_id]["frequency"] == "Monthly" else "Daily" }}
+                            {{ "Monthly" if metadata[series_id].frequency == "Monthly" else "Daily" }}
                             &middot; as of {{ s.as_of }}
                         </span>
                     </td>

@@ -94,7 +94,7 @@ def get_price_summary():
     metadata = get_metadata()
     price_summary: dict[str, dict[str, float | date | None]] = {}
     for series_id, observations in prices.items():
-        frequency: str = metadata[series_id]["frequency"]
+        frequency: str = metadata[series_id].frequency
         latest_price, pcnt_change, last_date = calculate_pcnt_change(observations, frequency)
         price_summary[series_id] = {
             'latest_price': latest_price,
