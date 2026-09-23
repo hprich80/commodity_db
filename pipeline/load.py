@@ -44,6 +44,7 @@ def create_tables():
 
 
 def insert_metadata(metadata: SeriesMetaData):
+    """Upsert metadata by series_id, updating only changed fields."""
     with get_db_cursor() as cur:
         cur.execute(
             """
@@ -80,6 +81,7 @@ def insert_metadata(metadata: SeriesMetaData):
 
 
 def insert_observations(observations: SeriesObservations):
+    """Upsert observations by (series_id, date), updating only changed values."""
     with get_db_cursor() as cur:
         rows = zip(observations.date, observations.value)
         cur.executemany(
@@ -113,6 +115,8 @@ def get_latest_observation_date(series_id: str) -> date | None:
 
 
 def get_latest_observation(series_id: str):
+    """Return the latest non-null observation, or None if none exists.
+    """
     with get_db_cursor() as cur:
         cur.execute(
             """

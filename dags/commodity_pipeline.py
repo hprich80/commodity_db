@@ -1,7 +1,7 @@
 import sys
 
 sys.path.insert(0, "/opt/airflow/project")
-from airflow.sdk import dag, task
+from airflow.sdk import dag, task  # pyright: ignore[reportUnknownVariableType]
 import requests
 from datetime import datetime, timedelta
 from pipeline.models import CommodityBasket, SeriesMetaData, SeriesObservations
@@ -27,6 +27,7 @@ def commodity_pipeline():
         last_observation = get_latest_observation(commodity)
         last_observation_date = last_observation[1] if last_observation else None
         last_observation_value = last_observation[2] if last_observation else None
+        # Resume ingestion after the latest non-null observation (full history is fetched on first run).
         start_date = (
             last_observation[1] + timedelta(days=1) if last_observation else None
         )
@@ -47,7 +48,8 @@ def commodity_pipeline():
             insert_metadata(metadata)
             insert_observations(observations)
 
-    process_series.expand(commodity=[c.value for c in CommodityBasket])
+    # Map one task per series so failures and retries are isolated.
+    _ = process_series.expand(commodity=[c.value for c in CommodityBasket])  # pyright: ignore[reportUnknownMemberType]
 
 
 _ = commodity_pipeline()

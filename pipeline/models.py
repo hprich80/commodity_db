@@ -39,8 +39,8 @@ class SeriesMetaData(Series):
 
     @classmethod
     def from_FRED_response(
-        cls, series_id: str, json: dict[str, Any]
-    ) -> "SeriesMetaData":  # pyright: ignore[reportExplicitAny]
+        cls, series_id: str, json: dict[str, Any]  # pyright: ignore[reportExplicitAny]
+    ) -> "SeriesMetaData":
 
         logger.info(f"Constructing series metadata for {series_id}")
 
@@ -73,9 +73,9 @@ class SeriesMetaData(Series):
             raise
 
     @classmethod
-    def from_db_query(cls, db_response: tuple[Any, ...]) -> "SeriesMetaData":
+    def from_db_query(cls, db_response: tuple[Any, ...]) -> "SeriesMetaData":  # pyright: ignore[reportExplicitAny]
         try:
-            return cls(*db_response)
+            return cls(*db_response)  # pyright: ignore[reportAny]
         except TypeError as e:
             series_id: str = db_response[0] if db_response else "<empty_row>"
             logger.error(f"Malformed DB row for {series_id}: {e}")
@@ -89,9 +89,10 @@ class SeriesObservations(Series):
 
     @classmethod
     def from_FRED_response(
-        cls, series_id: str, json: dict[str, Any]
-    ) -> "SeriesObservations":  # pyright: ignore[reportExplicitAny]
-
+        cls, series_id: str, json: dict[str, Any]  # pyright: ignore[reportExplicitAny]
+    ) -> "SeriesObservations":
+        """Parse observations, mapping '.' to None and preserving response order.
+        """
         logger.info(f"Constructing series observations for {series_id}")
 
         if (observations := json.get("observations")) is None:
@@ -110,11 +111,11 @@ class SeriesObservations(Series):
         try:
             for obs in observations:  # pyright: ignore[reportAny]
                 datelist.append(
-                    datetime.date.fromisoformat(obs["date"])
-                )  # pyright: ignore[reportAny]
+                    datetime.date.fromisoformat(obs["date"])  # pyright: ignore[reportAny]
+                )
                 valuelist.append(
-                    None if obs["value"] == "." else float(obs["value"])
-                )  # pyright: ignore[reportAny]
+                    None if obs["value"] == "." else float(obs["value"])  # pyright: ignore[reportAny]
+                )
         except KeyError as e:
             logger.error(
                 f"Failed to parse observations for {series_id}. Contains malformed key: {e}"

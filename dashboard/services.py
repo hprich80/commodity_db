@@ -9,6 +9,10 @@ import numpy as np
 def calculate_open_positions(
     latest_prices: dict[str, tuple[date, float]], trades: list[TradeData]
 ):
+    """Calculate positions and their P&L using average cost. Trades are processed in order of trade date. 
+
+    Positive quantities represent longs; negative quantities represent shorts.
+    """
     trades_by_series: defaultdict[str, list[TradeData]] = defaultdict(list)
     for trade in trades:
         trades_by_series[trade.series_id].append(trade)
@@ -79,6 +83,8 @@ def calculate_pcnt_change(observations: dict[date, float], frequency: str):
 
 
 def calculate_td(observations: dict[date, float], format: str):
+    """Calculate to date performance.
+    """
     td_format = {
         "mtd": date.today().month,
         "qtd": (date.today().month - 1) // 3 * 3 + 1,
@@ -91,7 +97,7 @@ def calculate_td(observations: dict[date, float], format: str):
     if last_date <= first_date:
         td = None
         return td
-    # If last date is valid, but first_date doesn't return a price, walk backwards at least 5 days to find a valid price
+    # If the period-start price is missing, look back at most five business days.
     if not (first_price := observations.get(first_date)):
         candidate = first_date
         for i in range(1, len(dates)):

@@ -11,6 +11,7 @@ def get_connection() -> PgConnection:
 
 @contextmanager
 def get_db_cursor():
+    """Yield a cursor; commit on success, roll back on error, and always close."""
     conn = get_connection()
     try:
         with conn.cursor() as cur:

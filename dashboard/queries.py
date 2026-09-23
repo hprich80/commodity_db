@@ -21,6 +21,8 @@ def get_latest_price():
 
 
 def get_historical_prices():
+    """Return prices by date for each series. Dates are inserted newest first - downstream return calculations rely on this order.
+    """
     with get_db_cursor() as cur:
         cur.execute("""
             SELECT series_id, date, value 

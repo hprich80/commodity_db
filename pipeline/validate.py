@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_nulls(obs: SeriesObservations, max_null_threshold: int = 2):
+    """Check the final three observations in the fetched batch for nulls."""
     if (null_count := sum(1 for v in obs.value[-3:] if v is None)) > max_null_threshold:
         logger.warning(
             f"{null_count} null rows for series {obs.series_id}. Threshold = {max_null_threshold}"
@@ -22,6 +23,7 @@ def check_performance(
     last_observation_value: float | None,
     max_perf_threshold: float = 1.5,
 ):
+    """Warn on performance above the threshold (1.5 means 150%)."""
     count = 0
 
     def evaluate_pair(prev: float | None, cur: float | None, date_str: date | None):
@@ -37,6 +39,7 @@ def check_performance(
     if not obs.value:
         logger.info(f"No rows to check for series {obs.series_id}")
         return
+    # Compare the first fetched value with the last stored value
     evaluate_pair(last_observation_value, obs.value[0], obs.date[0])
     for i in range(1, len(obs.value)):
         evaluate_pair(obs.value[i - 1], obs.value[i], obs.date[i])
@@ -51,11 +54,13 @@ def check_performance(
 def check_staleness(
     obs: SeriesObservations,
     metadata: SeriesMetaData,
-    last_observation_date: date | None,
+    last_ingested_date: date | None,
 ):
+    """Check the latest observation date for staleness (on the fetched batch or last ingested date if no new rows)."""
     freq: str = metadata.frequency
     freq_to_max_age = {"Daily": 1, "Weekly": 7, "Monthly": 45}
     max_age = freq_to_max_age.get(freq)
+    last_observation_date = obs.date[-1] if obs.date else last_ingested_date
     if max_age is None:
         logger.warning(f"No frequency metadata for series {metadata.series_id}")
         return
@@ -77,11 +82,12 @@ def check_staleness(
 def validate_series(
     obs: SeriesObservations,
     metadata: SeriesMetaData,
-    last_observation_date: date | None,
+    last_ingested_date: date | None,
     last_observation_value: float | None,
     max_null_threshold: int = 2,
     max_perf_threshold: float = 1.5,
 ):
+    """Log data-quality warnings without rejecting or modifying observations."""
     check_nulls(obs, max_null_threshold)
     check_performance(obs, last_observation_value, max_perf_threshold)
-    check_staleness(obs, metadata, last_observation_date)
+    check_staleness(obs, metadata, last_ingested_date)
