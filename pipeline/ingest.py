@@ -11,17 +11,20 @@ API_KEY = os.getenv("API_KEY")
 
 logger = logging.getLogger(__name__)
 
-def get_data(series_id: str, session: requests.Session, observation_start: date | None) -> tuple[dict[str,Any],dict[str,Any]]:  # pyright: ignore[reportExplicitAny]
-    url_series = FredEndpoint.SERIES.value 
+
+def get_data(
+    series_id: str, session: requests.Session, observation_start: date | None
+) -> tuple[dict[str, Any], dict[str, Any]]:  # pyright: ignore[reportExplicitAny]
+    url_series = FredEndpoint.SERIES.value
     url_obs = FredEndpoint.OBSERVATIONS.value
     PARAMS = {
-        'api_key': API_KEY,
-        'series_id': series_id,
-        'file_type': 'json',
+        "api_key": API_KEY,
+        "series_id": series_id,
+        "file_type": "json",
     }
     OBS_PARAMS = dict(PARAMS)
     if observation_start is not None:
-        OBS_PARAMS['observation_start'] = observation_start.strftime("%Y-%m-%d")
+        OBS_PARAMS["observation_start"] = observation_start.strftime("%Y-%m-%d")
     logger.info(f"Fetching data for series {series_id}")
     try:
         response_series = session.get(url_series, params=PARAMS)
@@ -33,4 +36,3 @@ def get_data(series_id: str, session: requests.Session, observation_start: date 
         raise
 
     return response_series.json(), response_obs.json()
-

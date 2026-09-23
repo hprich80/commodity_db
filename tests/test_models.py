@@ -2,11 +2,14 @@ import datetime
 import pytest
 from pipeline.models import SeriesObservations
 
+
 def test_from_fred_response_parses_values():
-    response = {"observations": [
-        {"date": "2024-01-01", "value": "100.5"},
-        {"date": "2024-01-02", "value": "101.0"},
-    ]}
+    response = {
+        "observations": [
+            {"date": "2024-01-01", "value": "100.5"},
+            {"date": "2024-01-02", "value": "101.0"},
+        ]
+    }
     result = SeriesObservations.from_FRED_response("TEST_SERIES", response)
     assert result.series_id == "TEST_SERIES"
     assert result.date == [datetime.date(2024, 1, 1), datetime.date(2024, 1, 2)]
@@ -14,10 +17,12 @@ def test_from_fred_response_parses_values():
 
 
 def test_from_fred_response_dot_value_becomes_none():
-    response = {"observations": [
-        {"date": "2024-01-01", "value": "."},
-        {"date": "2024-01-02", "value": "101.0"},
-    ]}
+    response = {
+        "observations": [
+            {"date": "2024-01-01", "value": "."},
+            {"date": "2024-01-02", "value": "101.0"},
+        ]
+    }
     result = SeriesObservations.from_FRED_response("TEST_SERIES", response)
     assert result.value == [None, 101.0]
 

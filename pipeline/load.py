@@ -1,9 +1,10 @@
 from datetime import date
-from .models import SeriesMetaData, SeriesObservations 
+from .models import SeriesMetaData, SeriesObservations
 import logging
 from db import get_db_cursor
 
 logger = logging.getLogger(__name__)
+
 
 def create_tables():
     with get_db_cursor() as cur:
@@ -41,9 +42,11 @@ def create_tables():
                     );
                 """)
 
+
 def insert_metadata(metadata: SeriesMetaData):
     with get_db_cursor() as cur:
-        cur.execute("""
+        cur.execute(
+            """
                     INSERT INTO series_metadata (series_id, title, frequency, units, seasonal_adjustment, last_updated, popularity, notes, fetched_at)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
                     ON CONFLICT (series_id) DO UPDATE SET
@@ -58,40 +61,56 @@ def insert_metadata(metadata: SeriesMetaData):
                     WHERE (series_metadata.title, series_metadata.frequency, series_metadata.units, series_metadata.seasonal_adjustment, series_metadata.last_updated, series_metadata.popularity, series_metadata.notes)
                     IS DISTINCT FROM 
                         (EXCLUDED.title, EXCLUDED.frequency, EXCLUDED.units, EXCLUDED.seasonal_adjustment, EXCLUDED.last_updated, EXCLUDED.popularity, EXCLUDED.notes)
-                    """, (metadata.series_id, metadata.title, metadata.frequency, metadata.units, metadata.seasonal_adjustment, metadata.last_updated, metadata.popularity, metadata.notes)
-                    )
+                    """,
+            (
+                metadata.series_id,
+                metadata.title,
+                metadata.frequency,
+                metadata.units,
+                metadata.seasonal_adjustment,
+                metadata.last_updated,
+                metadata.popularity,
+                metadata.notes,
+            ),
+        )
         if cur.rowcount > 0:
             logger.info(f"Upserted metadata for {metadata.series_id}")
         else:
             logger.info(f"No metadata changed for {metadata.series_id}")
 
+
 def insert_observations(observations: SeriesObservations):
     with get_db_cursor() as cur:
-        rows= zip(observations.date, observations.value)
-        cur.executemany("""
+        rows = zip(observations.date, observations.value)
+        cur.executemany(
+            """
                     INSERT INTO series_observations (series_id, date, value, fetched_at)
                     VALUES (%s , %s, %s, NOW())
                     ON CONFLICT (series_id, date) DO UPDATE SET
                         value = EXCLUDED.value,
                         fetched_at = EXCLUDED.fetched_at
                     WHERE series_observations.value IS DISTINCT FROM EXCLUDED.value;
-                    """, [(observations.series_id, date, value) for date, value in rows]
-                    )
+                    """,
+            [(observations.series_id, date, value) for date, value in rows],
+        )
         if cur.rowcount > 0:
             logger.info(f"Upserted {cur.rowcount} rows for {observations.series_id}")
         else:
             logger.info(f"No rows upserted for {observations.series_id}")
 
+
 def get_latest_observation_date(series_id: str) -> date | None:
     with get_db_cursor() as cur:
-        cur.execute("""
+        cur.execute(
+            """
                 SElECT MAX(date) FROM series_observations WHERE series_id = (%s) 
                 """,
-            (series_id,)
+            (series_id,),
         )
         result: list[tuple[date]] = cur.fetchall()
     latest_date = result[0][0]
     return latest_date
+
 
 def get_latest_observation(series_id: str):
     with get_db_cursor() as cur:
@@ -101,7 +120,8 @@ def get_latest_observation(series_id: str):
             FROM series_observations
             WHERE value IS NOT NULL AND series_id = %s
             ORDER BY date DESC
-            """, (series_id,)
+            """,
+            (series_id,),
         )
-        row: tuple[str, date, float] | None = cur.fetchone()    
-    return row 
+        row: tuple[str, date, float] | None = cur.fetchone()
+    return row
