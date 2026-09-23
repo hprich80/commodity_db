@@ -1,10 +1,9 @@
 from datetime import date
-
 from .models import SeriesMetaData, SeriesObservations 
 import logging
 from db import get_db_cursor
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 def create_tables():
     with get_db_cursor() as cur:
@@ -94,3 +93,15 @@ def get_latest_observation_date(series_id: str) -> date | None:
     latest_date = result[0][0]
     return latest_date
 
+def get_latest_observation(series_id: str):
+    with get_db_cursor() as cur:
+        cur.execute(
+            """
+            SELECT series_id, date, value
+            FROM series_observations
+            WHERE value IS NOT NULL AND series_id = %s
+            ORDER BY date DESC
+            """, (series_id,)
+        )
+        row: tuple[str, date, float] | None = cur.fetchone()    
+    return row 

@@ -5,7 +5,7 @@ import requests
 from datetime import datetime, timedelta
 from pipeline.models import CommodityBasket, SeriesMetaData, SeriesObservations 
 from pipeline.ingest import get_data
-from pipeline.load import get_latest_observation_date, insert_metadata, insert_observations
+from pipeline.load import get_latest_observation, insert_metadata, insert_observations
 from pipeline.validate import validate_series 
 
 @dag(
@@ -22,14 +22,16 @@ def commodity_pipeline():
         retry_exponential_backoff=True
     )
     def process_series(commodity: str):
-        last_observation = get_latest_observation_date(commodity)
-        start_date = last_observation + timedelta(days=1) if last_observation else None
+        last_observation = get_latest_observation(commodity)
+        last_observation_date = last_observation[1] if last_observation else None
+        last_observation_value= last_observation[2] if last_observation else None
+        start_date = last_observation[1] + timedelta(days=1) if last_observation else None
 
         with requests.Session() as session:
             series, obs = get_data(commodity, session = session, observation_start=start_date)
             metadata: SeriesMetaData = SeriesMetaData.from_FRED_response(commodity, series)
             observations: SeriesObservations = SeriesObservations.from_FRED_response(commodity, obs)
-            validate_series(observations, metadata, last_observation)
+            validate_series(observations, metadata, last_observation_date, last_observation_value)
             insert_metadata(metadata)
             insert_observations(observations)
 
