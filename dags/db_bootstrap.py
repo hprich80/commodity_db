@@ -4,9 +4,9 @@ sys.path.insert(0, "/opt/airflow/project")
 from datetime import datetime
 from airflow import DAG
 from pipeline.load import create_tables
-from airflow.operators.python import (
-    PythonOperator,
-)  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+from airflow.operators.python import (  # pyright: ignore[reportMissingImports]
+    PythonOperator,  # pyright: ignore[reportUnknownVariableType]
+)
 
 
 def pipeline_bootstrap():
