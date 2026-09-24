@@ -1,3 +1,4 @@
+import os
 from flask import Flask, redirect, render_template, request, url_for
 from pipeline.models import TradeData
 from .queries import get_latest_price, get_metadata, get_trades, insert_trade
@@ -37,6 +38,10 @@ def trades():
 
 @app.route("/trades/new", methods=["GET", "POST"])
 def new_trade():
+    if os.getenv("RESTRICT_TRADE_ACCESS") == "true":
+        if os.getenv("HOME_IP") != request.remote_addr:
+            return "Posting trades is restricted in live demo", 403
+
     if request.method == "POST":
         trade = TradeData.from_form(
             series_id=request.form["series_id"], form=request.form

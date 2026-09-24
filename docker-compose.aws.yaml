@@ -146,6 +146,8 @@ services:
     ports: 
       - '5001:5000'
     environment:
+      RESTRICT_TRADE_ACCESS: 'true'
+      HOME_IP: ${HOME_IP}
       DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres-fred:5432/fred_pipeline
     depends_on:
       postgres-fred: 
