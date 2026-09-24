@@ -38,6 +38,8 @@ def trades():
 
 @app.route("/trades/new", methods=["GET", "POST"])
 def new_trade():
+
+    # For the live demo hosted on EC2, trade posting is restricted to home IP.
     if os.getenv("RESTRICT_TRADE_ACCESS") == "true":
         if os.getenv("HOME_IP") != request.remote_addr:
             return "Posting trades is restricted in live demo", 403
