@@ -19,14 +19,15 @@ from pipeline.validate import validate_series
 def commodity_pipeline():
     @task(
         retries=3,
-        retry_delay=timedelta(seconds=5),
+        retry_delay=timedelta(seconds=10),
         execution_timeout=timedelta(minutes=10),
         retry_exponential_backoff=True,
     )
     def process_series(commodity: str):
         last_observation = get_latest_observation(commodity)
         last_observation_date = last_observation[1] if last_observation else None
-        last_observation_value = last_observation[2] if last_observation else None
+        # Value must be converted to float as the column NUMERIC returns type decimal. 
+        last_observation_value = float(last_observation[2]) if last_observation else None
         # Resume ingestion after the latest non-null observation (full history is fetched on first run).
         start_date = (
             last_observation[1] + timedelta(days=1) if last_observation else None
