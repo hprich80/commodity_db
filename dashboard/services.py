@@ -58,7 +58,7 @@ def calculate_open_positions(
 
 def get_historical_prices_json_format():
     prices = get_historical_prices()
-    json_prices: dict[str, dict[str, float]] = {
+    json_prices: dict[str, dict[str, float | None]] = {
         series_id: {
             date.isoformat(date_key): value for date_key, value in observations.items()
         }
@@ -67,7 +67,7 @@ def get_historical_prices_json_format():
     return json_prices
 
 
-def calculate_pcnt_change(observations: dict[date, float], frequency: str):
+def calculate_pcnt_change(observations: dict[date, float | None], frequency: str):
     limit = 31 if frequency == "Monthly" else 5
     last_date = list(observations.keys())[0]
     prev_date = list(observations.keys())[1]
@@ -75,14 +75,14 @@ def calculate_pcnt_change(observations: dict[date, float], frequency: str):
     today_diff = np.busday_count(last_date, date.today())
     last_price = observations[last_date]
     prev_price = observations[prev_date]
-    if (date_diff > limit) or (today_diff > limit):
+    if (date_diff > limit) or (today_diff > limit) or (last_price is None) or (prev_price is None) or (prev_price == 0):
         pcnt_change = None
     else:
         pcnt_change = (last_price - prev_price) / prev_price
     return last_price, pcnt_change, last_date
 
 
-def calculate_td(observations: dict[date, float], format: str):
+def calculate_td(observations: dict[date, float | None], format: str):
     """Calculate to date performance.
     """
     td_format = {
@@ -95,8 +95,7 @@ def calculate_td(observations: dict[date, float], format: str):
     first_date = date(date.today().year, td_format[format], 1)
     # If last date is before or equal period start
     if last_date <= first_date:
-        td = None
-        return td
+        return None
     # If the period-start price is missing, look back at most five business days.
     if not (first_price := observations.get(first_date)):
         candidate = first_date
@@ -108,13 +107,12 @@ def calculate_td(observations: dict[date, float], format: str):
             first_price = None
         else:
             first_price = observations.get(candidate)
+    last_price = observations[last_date]
+    # If last/first price is None
+    if first_price is None or last_price is None or first_price == 0:
+        return None
     # If last date is after period start
-    if first_price:
-        last_price = observations[last_date]
-        td = (last_price - first_price) / first_price
-    else:
-        td = None
-    return td
+    return (last_price - first_price) / first_price
 
 
 def get_price_summary():

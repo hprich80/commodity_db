@@ -29,8 +29,8 @@ def get_historical_prices():
             FROM series_observations 
             ORDER BY series_id, date DESC 
             """)
-        rows: list[tuple[str, date, float]] = cur.fetchall()
-        prices: dict[str, dict[date, float]] = defaultdict(dict)
+        rows: list[tuple[str, date, float | None]] = cur.fetchall()
+        prices: dict[str, dict[date, float | None]] = defaultdict(dict)
         for series_id, price_date, value in rows:
             if series_id not in prices:
                 prices[series_id] = {}
