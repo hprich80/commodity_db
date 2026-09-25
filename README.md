@@ -4,7 +4,7 @@ An end-to-end data engineering project that ingests commodity market data from t
 
 The project is designed as a small, containerised data platform. Users can input hypothetical trade data via the Flask app and see hypothetical mark-to-market valuations and realised returns. It is worth noting the price streams included in the app are just commodity indices and are not a realistic reflection of actual tradeable contracts.
 
-The container can be run locally – I have also hosted a live demo of the dashboard on an AWS instance, accessible at: <http://13.49.175.117:5001>. Please note that uptime is not guaranteed.
+The container can be run locally – I have also hosted a live demo of the dashboard on an AWS EC2 instance, accessible at: <http://16.192.39.195:5001>. The public demo supports viewing only; trade submission is restricted. Please note that uptime and performance are not guaranteed.
 
 ## What it demonstrates
 
@@ -25,7 +25,8 @@ The container can be run locally – I have also hosted a live demo of the dashb
 - Reproducible Docker Compose environment
   - All services are containerised via Docker Compose
 - AWS deployment
-  - The version deployed to EC2 uses the LocalExecutor configuration in `docker-compose.aws.yaml`. I use LocalExecutor here to reduce the CPU throttling that comes with AWS' free plan.
+  - The version deployed to EC2 uses the LocalExecutor configuration in `docker-compose.aws.yaml`. The AWS deployment uses LocalExecutor to reduce resource
+    overhead on a small EC2 instance.
 
 ## Architecture
 
@@ -136,7 +137,6 @@ The following changes are hypothetical next steps I would implement to further p
 ### Engineering Changes
 
 - Replace the bootstrap DAG's manual `CREATE TABLE` statements with versioned migrations (for example, Alembic) to support schema evolution.
-- Package the shared `pipeline` module or configure `PYTHONPATH` centrally, rather than adding the project path in each DAG file.
 - Build a slimmer dashboard image with only dashboard dependencies; the current requirements file is shared with development tooling.
 - Add hard data-quality gates where a failed load is safer than accepting data, alongside alerting and monitoring.
 - For a public deployment, put the dashboard behind HTTPS and implement an authorisation layer.
