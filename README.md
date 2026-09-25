@@ -125,7 +125,7 @@ pytest tests/ -v
 
 ## Production next steps
 
-The following changes are hypothetical next steps I would implement to further productionise this application but are out of my project's scope:
+The following changes are hypothetical next steps to further productionise this project but are out of its scope:
 
 ### Scope Extensions
 
