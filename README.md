@@ -4,7 +4,7 @@ An end-to-end data engineering project that ingests commodity market data from t
 
 The project is designed as a small, containerised data platform. Users can input hypothetical trade data via the Flask app and see hypothetical mark-to-market valuations and realised returns. It is worth noting the price streams included in the app are just commodity indices and are not a realistic reflection of actual tradeable contracts.
 
-The container can be run locally – I have also hosted a live demo of the dashboard on an AWS EC2 instance, accessible at: <http://16.192.39.195:5001>. The public demo supports viewing only; trade submission is restricted. Please note that uptime and performance are not guaranteed.
+The container can be run locally – I have also hosted a live demo of the dashboard on an AWS EC2 instance, accessible at: <http://16.192.39.195:5001> (NB: As of 17-Nov 2026 the demo is no longer live as my free plan has ended). The public demo supports viewing only; trade submission is restricted. Please note that uptime and performance are not guaranteed.
 
 ## What it demonstrates
 
